@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+{{ define "gui/iframe" }}
+<html lang="en-US">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>弱字典管理系统</title>
+    <link href="/static/css/layui.css" rel="stylesheet">
+    <script src="/static/layui.js"></script>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    <!--  头部  -->
+    <div class="layui-header">
+        <div class="layui-logo layui-hide-xs layui-bg-black">弱字典管理系统</div>
+        <!-- 头部区域（可配合layui 已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left">
+            <!-- 移动端显示 -->
+            <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
+                <i class="layui-icon layui-icon-spread-left"></i>
+            </li>
+        </ul>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
+                {{ template "block/userinfo" }}
+                <dl class="layui-nav-child">
+                    <dd><a href="javascript:;">个人中心</a></dd>
+                    <dd><a href="javascript:;">其他功能</a></dd>
+                    <dd><a href="javascript:;">退出登陆</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
+                <a href="javascript:;">
+                    <i class="layui-icon layui-icon-more-vertical"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!--  左侧菜单  -->
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree">
+                <li class="layui-nav-item"><a href="index.html" target="iframeMain">介绍</a></li>
+                <li class="layui-nav-item"><a href="allin.html" target="iframeMain">all in 汇总</a></li>
+                <li class="layui-nav-item"><a href="universal.html" target="iframeMain">通用弱口令</a></li>
+                <li class="layui-nav-item"><a href="classification.html" target="iframeMain">分类速查库</a></li>
+                <li class="layui-nav-item"><a href="manage.html" target="iframeMain">系统管理</a></li>
+                <li class="layui-nav-item"><a href="tools.html" target="iframeMain">其他工具</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!--  右侧主体内容  -->
+    <div class="layui-body">
+        <iframe src="index.html" class="layadmin-iframe" name="iframeMain" style="width: 100%; height:100%; border:0;"></iframe>
+    </div>
+    <div class="layui-footer">
+        <!-- 底部固定区域 -->
+        底部固定区域
+    </div>
+</div>
+
+<script>
+    async function getJSON(url, systemName, where) {
+        const query = {
+            systemName: systemName,
+            where: where,
+        }
+        const option = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify(query)
+        }
+        try {
+            let response = await fetch(url, option);
+            return await response.json();
+        } catch (error) {
+            alert('Request Failed: ' + error);
+        }
+    }
+
+    async function sortData(system, where){
+        await getJSON("/api/sortData", system, where)
+    }
+
+    layui.use(function(){
+        const element = layui.element;
+        element.render('nav');
+    });
+
+    function copyData(system, where){
+        layerOpen({
+            title: "复制或下载",
+            content: '/copyAndDownData.html/' + system + '/' + where
+        })
+    }
+
+    function FillAndCopyData(system, where){
+        layerOpen({
+            title: "填充复制",
+            content: '/FillAndCopyData.html/' + system + '/' + where
+        })
+    }
+
+    function addData(system, where, clazz){
+        layerOpen({
+            title: "添加数据",
+            content: '/AddData.html/' + system + '/' + where + "/" + clazz
+        })
+    }
+
+    function layerOpen(custom){
+        let option = {
+            type: 2, // page 层类型
+            area: ['500px', '300px'],
+            offset: '16px',
+            title: "",
+            shade: 0.6, // 遮罩透明度
+            shadeClose: true, // 点击遮罩区域，关闭弹层
+            maxmin: true, // 允许全屏最小化
+            anim: 0, // 0-6 的动画形式，-1 不开启
+            content: ''
+        }
+        for (const key in custom){
+            option[key] = custom[key]
+        }
+        layer.open(option);
+    }
+</script>
+
+</body>
+</html>
+{{ end }}

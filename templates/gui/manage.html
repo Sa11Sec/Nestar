@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+{{ define "gui/manage" }}
+    {{ template "block/html-title" .}}
+    <div class="layui-card layui-panel">
+        <div class="layui-card-header">
+            系统管理
+        </div>
+        <div class="layui-card-body">
+            <div class="layui-panel" style="padding: 10px 0 10px 0">
+                <div class="layui-card-header">当前分类：共 {{ .Count }} 个</div>
+                <div class="layui-card-body"></div>
+            </div>
+
+            <div class="layui-panel" style="padding: 10px 0 10px 0">
+                <div class="layui-card-header">添加分类前，先查查有没有</div>
+                <div class="layui-card-body">
+                    <div>
+                        <div class="layui-form">
+                            <div class="layui-form-item">
+                                <div class="layui-input-group">
+                                    <div class="layui-input-split layui-input-prefix">
+                                        分类名称
+                                    </div>
+                                    <label>
+                                        <input type="text" id="searchName" placeholder="请输入系统名称" class="layui-input">
+                                    </label>
+                                    <div class="layui-input-suffix">
+                                        <button class="layui-btn layui-btn-primary" onclick="window.location.href='/manage.html/' + document.getElementById('searchName').value">模糊搜索</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        {{ range .Search }}
+                            <button type="button" class="layui-btn">{{ .Name }}</button>
+                        {{ end }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-panel" style="padding: 10px 0 10px 0">
+                <div class="layui-card-header">添加新的分类</div>
+                <div class="layui-card-body">
+                    <form class="layui-form" action="">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">输入系统名</label>
+                            <div class="layui-input-inline layui-input-wrap">
+                                <label>
+                                    <input type="text" name="systemName" lay-verify="required" autocomplete="off" lay-affix="clear" class="layui-input">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">是否常用</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="open" lay-skin="switch" lay-filter="switchTest" title="是|否">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button type="button" class="layui-btn" lay-submit lay-filter="submit">立即提交</button>
+                                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <br><br>
+    </div>
+
+    <script>
+        layui.use(['form'], function(){
+            const form = layui.form;
+            // 提交事件
+            form.on('submit(submit)', async function(data){
+                const field = data.field; // 获取表单字段值
+                const option = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify({
+                        systemName: field.systemName,
+                        type: field.open === "on",
+                    })
+                }
+                try {
+                    let response = await fetch("/api/addSystem", option);
+                    const data = await response.json();
+                    layer.msg(data["data"], {icon: 1, offset: '36px'})
+                } catch (error) {
+                    alert('Request Failed: ' + error);
+                }
+                return false; // 阻止默认 form 跳转
+            });
+        });
+    </script>
+    {{ template "block/html-foot" .}}
+{{ end }}

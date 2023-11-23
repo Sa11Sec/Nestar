@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+{{ define "gui/classification" }}
+    {{ template "block/html-title" .}}
+    <div class="layui-card layui-panel">
+        <div class="layui-card-header">
+            分类速查库
+        </div>
+        <div class="layui-card-body">
+            <div class="layui-panel" style="padding: 10px">
+                <div class="layui-btn-group">
+                    <button type="button" class="layui-btn">常用分类：</button>
+                    {{ range .Systems }}
+                        <a href="system.html/{{ .Name }}" target="iframeSystem"><button type="button" class="layui-btn">{{ .Name }}</button></a>
+                    {{ end }}
+                </div>
+                <hr>
+                <div>
+                    <div class="layui-form">
+                        <div class="layui-form-item">
+                            <div class="layui-input-group">
+                                <div class="layui-input-split layui-input-prefix">
+                                    其他分类
+                                </div>
+                                <label>
+                                    <input type="text" id="searchName" placeholder="请输入系统名称" class="layui-input">
+                                </label>
+                                <div class="layui-input-suffix">
+                                    <button class="layui-btn layui-btn-primary" onclick="window.location.href='/classification.html/' + document.getElementById('searchName').value">模糊搜索</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    {{ range .Search }}
+                        <a href="/system.html/{{ .Name }}" target="iframeSystem"><button type="button" class="layui-btn">{{ .Name }}</button></a>
+                    {{ end }}
+                </div>
+
+            </div>
+            <div class="layui-panel" style="overflow: hidden;">
+                <iframe src="" class="layadmin-iframe" name="iframeSystem" style="width: 100%;border:0;" onload="this.height=this.contentWindow.document.documentElement.scrollHeight"></iframe>
+            </div>
+        </div>
+        <br><br>
+    </div>
+    {{ template "block/html-foot" .}}
+{{end}}

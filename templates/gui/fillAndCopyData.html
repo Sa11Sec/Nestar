@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+{{ define "gui/fillAndCopyData" }}
+{{ template "block/html-title" .}}
+<div style="padding: 20px 20px 0 20px">
+    <div>最多可以有 {{ .Count }} 行，你需要多少行数据呢？</div>
+    <br/>
+    <div id="ID-slider-demo-input"></div>
+    <br/>
+    <div>
+        <button type="button" class="layui-btn" id="copyButton" onclick="copyData('{{ .SystemName }}','{{ .Where }}')">复制数据</button>
+        <button type="button" class="layui-btn" id="downloadButton" onclick="downloadData('{{ .SystemName }}','{{ .Where }}')">下载数据</button>
+    </div>
+
+</div>
+
+<script>
+    async function getJSON(url, systemName, where) {
+        const query = {
+            systemName: systemName,
+            where: where,
+            count: window.UserSelectCount
+        }
+        const option = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify(query)
+        }
+        try {
+            let response = await fetch(url, option);
+            return await response.json();
+        } catch (error) {
+            alert('Request Failed: ' + error);
+        }
+    }
+
+    async function copyData(systemName, where){
+        let json_data = await getJSON("/api/copyData", systemName, where)
+        await navigator.clipboard.writeText(json_data["data"])
+        layer.tips('复制成功', "#copyButton", {tips: [1, '#16b777']})
+    }
+
+    async function downloadData(systemName, where){
+        let json_data = await getJSON("/api/copyData", systemName, where)
+        const blob = new Blob([json_data["data"]], {
+            type: "text/plain;charset=utf-8"
+        })
+        const objectURL = URL.createObjectURL(blob)
+        const aTag = document.createElement("a")
+        aTag.href = objectURL
+        aTag.download = where + "_" + systemName + "_" +  window.UserSelectCount + ".txt"
+        aTag.click()
+        URL.revokeObjectURL(objectURL)
+        layer.tips('下载成功', "#downloadButton", {tips: [1, '#16b777']})
+    }
+
+    layui.use(function(){
+        const slider = layui.slider;
+        const defineCount = 50;
+        // 渲染
+        slider.render({
+            elem: '#ID-slider-demo-input',
+            value: defineCount,
+            tips: true,
+            min: 0,
+            max: parseInt('{{ .Count }}'),
+            input: true, //输入框
+            setTips: function (value){
+                if (value >= 10000 ){
+                    return (value / 10000) + "万"
+                }
+                if(value > 1000){
+                    return  (value /1000) + "千";
+                }
+                return value
+            },
+            done: function (value){
+                window.UserSelectCount = value
+            }
+        });
+        window.UserSelectCount = defineCount;
+    });
+</script>
+{{ template "block/html-foot" .}}
+{{ end }}

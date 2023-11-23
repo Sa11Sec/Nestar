@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+{{ define "gui/index" }}
+    {{ template "block/html-title" .}}
+    <div class="layui-card layui-panel">
+        <div class="layui-card-header">
+            使用说明
+        </div>
+        <div class="layui-card-body">
+            <br/><h1>概览：</h1>
+            系统当前有 5 个模块<br/>
+            1. 弱口令管理<br/>
+            2. 通用弱口令<br/>
+            3. 分类速查库<br/>
+            4. all in 汇总<br/>
+            5. 其他工具（暂时不打算去实现）<br/>
+
+            <div>
+                <br/><h1>功能介绍：</h1>
+            </div>
+            <div>
+                1.简单复制是什么意思：就是复制到粘贴板里了，点击 “Username top10 + top1k:” 里面的简单复制，顾名思义就是 top10 + top1k 的简单复制，同理....
+            </div>
+
+            <div>
+                <br/><h1>小提示：</h1>
+                <div>1. 不要删除弱字典展示框最后一行的空行(最后一个字符 \n 会被默认删除)，如果被你手动删除了，代码就会删除最后一个字符了。</div>
+                <div>2. 添加数据成功后，页面不会立刻加载最新的数据，需要你自己点一下当前的菜单项，才会加载最新的数据。</div>
+                <div>3. 如果你添加的数据是已经存在的了，那么只会增加其优先级，前端页面是看不出来什么变化的。</div>
+                <div>4. 建议添加数据后，不要立即整理，建议等待使用一段时间后，让各条数据的优先级产生差异后再整理，否则可能导致重要的数据被放到垃圾桶里</div>
+                <div></div>
+            </div>
+
+            <div>
+                <br/><h1>待优化：</h1>
+                <div>1. 首页使用小窗格来放置 iframe ，可以减少网络请求。</div>
+                <div>2. 小 bug ：如果空字符排在了第一位，就不会显示了，而且也复制不到了, 这是 go 模板的问题，暂时无法解决。:)</div>
+                <div>3. allin 汇总哪里的列表暂时先不展示，以后再新建一个表，专门用来展示前 1k 吧。</div>
+
+            </div>
+        </div>
+        <br><br>
+    </div>
+    {{ template "block/html-foot" .}}
+{{ end }}

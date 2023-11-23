@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+{{ define "gui/system" }}
+{{ template "block/html-title" .}}
+<div class="layui-card layui-panel layui-bg-gray">
+    <div class="layui-card-body">
+        <div class="layui-row layui-col-space30">
+            <!-- 遍历 Part = Username、Passwd -->
+            {{ range .DataAll }}
+            {{ template "layui-col-lg6" .}}
+            {{ end }}
+        </div>
+    </div>
+    <br><br>
+</div>
+
+<script>
+    async function sortData(where){
+        layer.confirm("是否要进行整理<br/>注意：请不要频繁整理，<br/>1. 消耗性能。<br/>2. 如果优先级没有拉开差距，<br/>那么可能导致重要数据被放到垃圾桶中", {
+            btn: ['确定', '关闭'], //按钮
+            offset: '36px',
+        }, async function () {
+            await window.parent.parent.sortData('{{ .System }}', where)
+            layer.msg("整理成功", {icon: 1, offset: '36px'})
+        }, function(){
+        });
+    }
+
+    async function addData(where, clazz){
+        await window.parent.parent.addData('{{ .System }}', where, clazz)
+    }
+
+    function FillAndCopyData(){
+        window.parent.parent.FillAndCopyData()
+    }
+
+    function copyAll(where){
+        // 定义两个变量用于存储 textarea 中的值
+        let textarea1 = document.getElementById(where + "Top10").value.slice(0, -1);
+        let textarea2 = document.getElementById(where + "Top1k").value.slice(0, -1);
+        // 合并内容
+        const combinedText = textarea1 + "\n" + textarea2;
+        // 写入数据
+        navigator.clipboard.writeText(combinedText)
+        layer.tips('复制成功', "#"+where+"TopALlCopyButton", {tips: [1, '#16b777']})
+    }
+
+    function copyOne(where){
+        // 定义变量用于存储 textarea 中的值
+        let textarea = document.getElementById(where).value.slice(0, -1);
+        // 写入数据
+        navigator.clipboard.writeText(textarea);
+        layer.tips('复制成功', "#"+where+"CopyButton", {tips: [1, '#16b777']})
+    }
+
+    function reFlush(){
+        location.reload()
+    }
+</script>
+{{ template "block/html-foot" .}}
+{{ end }}
+
+{{ define "layui-col-lg6" }}
+<div class="layui-col-lg6">
+    <div class="layui-card">
+        <!-- 第一部分是 top10 + top1k 的总体管理 -->
+        <div class="layui-card-body">
+            <fieldset class="layui-elem-field">
+                <legend>{{ .Name }} top10 + top1k:</legend>
+                <div class="layui-field-box">
+                    <div class="layui-btn-group">
+                        <button class="layui-btn layui-btn-sm" id="{{ .Name }}TopALlCopyButton" onclick="copyAll('{{ .Name }}')">简单复制</button>
+                        <!--                        <button class="layui-btn layui-btn-sm" onclick="FillAndCopyData('{{ .Name }}')">填充复制</button>-->
+                        <!--                        <button class="layui-btn layui-btn-sm" onclick="FillAndCopyData('{{ .Name }}')">简单或填充下载</button>-->
+                        <button class="layui-btn layui-btn-sm" onclick="sortData('{{ .Name }}')">整理数据</button>
+                        <button class="layui-btn layui-btn-sm" onclick="reFlush()">刷新数据</button>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <!-- 第二部分是 top10 的管理 -->
+        <div class="layui-card-body">
+            <fieldset class="layui-elem-field">
+                <legend>{{ .Name }} top10:</legend>
+                <div class="layui-field-box">
+                    <div class="layui-btn-group">
+                        <button class="layui-btn layui-btn-sm" id="{{ .Name }}Top10CopyButton" onclick="copyOne('{{ .Name }}Top10')">简单复制</button>
+                        <button class="layui-btn layui-btn-sm" onclick="addData('{{ .Name }}', 'top10')">添加数据</button>
+                    </div>
+                    <label>
+                        {{ $concat := "" }}
+                        {{ range .Top10 }}
+                        {{ $concat = printf "%s%s\n" $concat .Cnt }}
+                        {{ end }}
+                        <textarea id="{{ .Name }}Top10" placeholder="多行文本框" class="layui-textarea" style="height: 250px">{{ $concat }}</textarea>
+                    </label>
+                </div>
+            </fieldset>
+        </div>
+        <!-- 第三部分是 top1k 的管理 -->
+        <div class="layui-card-body">
+            <fieldset class="layui-elem-field">
+                <legend>{{ .Name }} top1k:</legend>
+                <div class="layui-field-box">
+                    <div class="layui-btn-group">
+                        <button class="layui-btn layui-btn-sm" id="{{ .Name }}Top1kCopyButton" onclick="copyOne('{{ .Name }}Top1k')">简单复制</button>
+                        <button class="layui-btn layui-btn-sm" onclick="addData('{{ .Name }}', 'top1k')">添加数据</button>
+                    </div>
+                    <label>
+                        {{ $concat := "" }}
+                        {{ range .Top1k }}
+                        {{ $concat = printf "%s%s\n" $concat .Cnt }}
+                        {{ end }}
+                        <textarea id="{{ .Name }}Top1k" placeholder="多行文本框" class="layui-textarea" style="height: 250px">{{ $concat }}</textarea>
+                    </label>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+{{ end }}

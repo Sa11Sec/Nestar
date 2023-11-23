@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+{{ define "gui/allin" }}
+    {{ template "block/html-title" .}}
+    <div class="layui-card layui-panel">
+        <div class="layui-card-header">
+            all in 汇总: 其他分类的用户名密码如果太多了，超过 1k 了，那么都默认放到这个垃圾桶里面了。
+        </div>
+        <div class="layui-card-body">
+            <div class="layui-row layui-col-space30">
+                <!-- 遍历 Part = Username、Passwd -->
+                {{ range .Part }}
+                    {{ template "top_all_layui-col-lg6" .}}
+                {{ end }}
+            </div>
+        </div>
+        <br><br>
+    </div>
+
+    <script>
+        // let textarea_list = document.querySelectorAll("textarea")
+        // for (let i = 0; i < textarea_list.length; i++) {
+        //     textarea_list[i].style.height = '500px'
+        // }
+        function copyData(where){
+            window.parent.copyData("allin", where);
+        }
+
+        function sortAllin(where){
+            layer.confirm("是否要进行整理<br/>注意：请不要频繁整理，<br/>1. 消耗性能。<br/>2. 十分消耗性能", {
+                btn: ['确定', '关闭'], //按钮
+                offset: '36px',
+            }, async function () {
+                await window.parent.sortData('allin', where)
+                layer.msg("整理成功", {icon: 1, offset: '36px'})
+            }, function(){
+            });
+        }
+    </script>
+    {{ template "block/html-foot" .}}
+{{ end }}
+
+{{ define "top_all_layui-col-lg6" }}
+<div class="layui-col-lg6">
+    <div class="layui-card">
+        <!-- 第一部分是 top10 + top1k 的总体管理 -->
+        <div class="layui-card-body">
+            <fieldset class="layui-elem-field">
+                <legend>top_all:</legend>
+                <div class="layui-field-box">
+                    {{ .Name }} list 当前数量：{{ .Count }} <br/>
+                    <div class="layui-btn-group">
+                        <button class="layui-btn layui-btn-sm" id="{{ .Name }}TopALlCopyButton" onclick="copyData('{{ .Name }}')">复制或下载数据</button>
+                        <button class="layui-btn layui-btn-sm" onclick="sortAllin('{{ .Name }}')">整理数据</button>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <!-- 第二部分是 top100 的管理 -->
+        <div class="layui-card-body">
+            <fieldset class="layui-elem-field">
+                <legend>前 100:</legend>
+                <div class="layui-field-box">
+<!--                    <div class="layui-btn-group">-->
+<!--                        <button class="layui-btn layui-btn-sm" id="{{ .Name }}Top100CopyButton" onclick="copyOne('{{ .Name }}Top100')">简单复制</button>-->
+<!--                        <button class="layui-btn layui-btn-sm" onclick="copyOne('{{ .Name }}Top100')">填充复制</button>-->
+<!--                        <button class="layui-btn layui-btn-sm" onclick="copyOne('{{ .Name }}Top100')">添加数据</button>-->
+<!--                    </div>-->
+                    <label>
+                        {{ $concat := "" }}
+                        {{ range .TopAll }}
+                            {{ $concat = printf "%s%s\n" $concat .Cnt }}
+                        {{ end }}
+                        <textarea id="{{ .Name }}Top100" placeholder="多行文本框" class="layui-textarea" style="height: 500px">暂时先不展示了{{ $concat }}</textarea>
+                    </label>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+{{ end }}

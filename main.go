@@ -9,8 +9,8 @@ import (
 )
 
 func main() {
-	// 设置为正式版
-	//gin.SetMode(gin.ReleaseMode)
+	//设置为正式版
+	gin.SetMode(gin.ReleaseMode)
 
 	r := gin.Default()
 
